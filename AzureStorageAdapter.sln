@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorageAdapter", "AzureStorageAdapter\AzureStorageAdapter.csproj", "{EEA70C6C-D0D3-4FA4-B8F7-6912D79855E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{FECCCB61-AEA7-41DE-9BAE-8041DE7721EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{EEA70C6C-D0D3-4FA4-B8F7-6912D79855E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEA70C6C-D0D3-4FA4-B8F7-6912D79855E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEA70C6C-D0D3-4FA4-B8F7-6912D79855E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FECCCB61-AEA7-41DE-9BAE-8041DE7721EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FECCCB61-AEA7-41DE-9BAE-8041DE7721EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FECCCB61-AEA7-41DE-9BAE-8041DE7721EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FECCCB61-AEA7-41DE-9BAE-8041DE7721EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
