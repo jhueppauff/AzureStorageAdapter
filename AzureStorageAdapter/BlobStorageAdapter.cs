@@ -9,7 +9,7 @@
     /// <summary>
     /// Blob Storage Adpater for Executing File Operations on the Azure Blob Storage
     /// </summary>
-    public class BlobStorageAdapter
+    public class BlobStorageAdapter : IBlobStorageAdapter
     {
         /// <summary>
         /// The default shared access expiry time
@@ -19,7 +19,7 @@
         /// <summary>
         /// The library container
         /// </summary>
-        private readonly CloudBlobContainer libraryContainer;
+        private readonly CloudBlobContainer blobContainer;
 
         /// <summary>
         /// Default SharedAccess Expiry Time for calls, overridable by subclasses
@@ -35,7 +35,7 @@
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            libraryContainer = blobClient.GetContainerReference(containerName);
+            blobContainer = blobClient.GetContainerReference(containerName);
         }
 
         /// <summary>
@@ -65,6 +65,32 @@
         }
 
         /// <summary>
+        /// Destroys the BLOB.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="deleteSnapshotsOption">The delete snapshots option.</param>
+        /// <param name="accessCondition">The access condition.</param>
+        /// <param name="blobRequestOptions">The BLOB request options.</param>
+        /// <param name="operationContext">The operation context.</param>
+        /// <returns></returns>
+        public async Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext)
+        {
+            var blob = blobContainer.GetBlockBlobReference(fileName);
+            await blob.DeleteIfExistsAsync(deleteSnapshotsOption, accessCondition, blobRequestOptions, operationContext);
+        }
+
+        /// <summary>
+        /// Destroys the BLOB.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <returns></returns>
+        public async Task DestroyBlob(string fileName)
+        {
+            var blob = blobContainer.GetBlockBlobReference(fileName);
+            await blob.DeleteIfExistsAsync();
+        }
+
+        /// <summary>
         /// Uploads to BLOB Storage.
         /// </summary>
         /// <param name="stream">The stream.</param>
@@ -74,7 +100,7 @@
         /// <returns></returns>
         private async Task<string> UploadToBlob(Stream stream, string name, string contentType)
         {
-            CloudBlockBlob blockBlob = libraryContainer.GetBlockBlobReference(name);
+            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(name);
             if (!await blockBlob.ExistsAsync())
             {
                 await blockBlob.UploadFromStreamAsync(stream);
