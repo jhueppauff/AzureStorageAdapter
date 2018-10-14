@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Julian Hüppauff</Authors>
+    <Copyright>Copyright Julian Hüppauff 2018 (MIT License)</Copyright>
+    <PackageLicenseUrl>https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jhueppauff/AzureStorageAdapter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jhueppauff/AzureStorageAdapter</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>.netstandard, azure</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
