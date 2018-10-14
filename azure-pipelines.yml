@@ -45,7 +45,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: false
-    projects: 'ADALAuthenticationClient'
+    projects: '$(ProjectName)'
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
     modifyOutputPath: false
