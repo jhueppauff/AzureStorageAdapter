@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/jhueppauff/AzureStorageAdapter</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>.netstandard, azure</PackageTags>
+    <PackageId>Hueppauff.AzureStorageAdapter</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
