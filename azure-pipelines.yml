@@ -32,7 +32,7 @@ steps:
   displayName: Compile
   inputs:
     command: build
-    projects: ADALAuthenticationClient
+    projects: $(ProjectName)
     arguments: '--configuration $(buildConfiguration)'
 
 # Pack
