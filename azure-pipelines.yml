@@ -14,6 +14,7 @@ variables:
   MajorVersion: '1'
   MinorVersion: '0'
   Patch: '0'
+  ProjectName: 'AzureStorageAdapter'
 
 steps:
 # Restore NuGet packages
@@ -21,7 +22,7 @@ steps:
   displayName: Restore NuGet Packages
   inputs:
     command: restore
-    projects: ADALAuthenticationClient
+    projects: $(ProjectName)
 
 - task: richardfennellBM.BM-VSTS-Versioning-Task.Version-DotNetCoreAssemblies-Task.VersionDotNetCoreAssemblies@2
   displayName: 'Version .NET Core Assemblies'
@@ -36,7 +37,7 @@ steps:
 
 # Pack
 - script:
-    dotnet pack $(Build.SourcesDirectory)\AzureStorageAdapter\AzureStorageAdapter.csproj -o $(build.artifactstagingdirectory) -c $(buildConfiguration) /p:Version=$(Build.BuildNumber)
+    dotnet pack $(Build.SourcesDirectory)\$(ProjectName)\$(ProjectName).csproj -o $(build.artifactstagingdirectory) -c $(buildConfiguration) /p:Version=$(Build.BuildNumber)
 
 
 - task: DotNetCoreCLI@2
