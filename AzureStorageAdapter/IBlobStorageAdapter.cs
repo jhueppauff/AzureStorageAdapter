@@ -47,5 +47,12 @@ namespace AzureStorageAdapter
         /// <param name="containerName">Container Name</param>
         /// <returns></returns>
         Task DestroyBlob(string fileName, string containerName);
+
+        /// <summary>
+        /// Deletes the BLOB container.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <returns></returns>
+        Task DeleteBlobContainerAsync(string containerName);
     }
 }

@@ -39,7 +39,7 @@
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             blobClient = storageAccount.CreateCloudBlobClient();
-            
+
         }
 
         /// <summary>
@@ -155,6 +155,19 @@
             };
 
             return sasConstraints;
+        }
+
+        /// <summary>
+        /// Deletes the BLOB container.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <returns><see cref="Task"/></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task DeleteBlobContainerAsync(string containerName)
+        {
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
         }
     }
 }
