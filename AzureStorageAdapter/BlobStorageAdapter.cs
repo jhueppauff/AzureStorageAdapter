@@ -17,9 +17,9 @@
         private const int defaultSharedAccessExpiryTime = 30;
 
         /// <summary>
-        /// The library container
+        /// The BLOB client
         /// </summary>
-        private readonly CloudBlobContainer blobContainer;
+        private readonly CloudBlobClient blobClient;
 
         /// <summary>
         /// Default SharedAccess Expiry Time for calls, overridable by subclasses
@@ -31,11 +31,11 @@
         /// </summary>
         /// <param name="blobConnectionString">The BLOB connection string.</param>
         /// <param name="containerName">Name of the container.</param>
-        public BlobStorageAdapter(string blobConnectionString, string containerName)
+        public BlobStorageAdapter(string blobConnectionString)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            blobContainer = blobClient.GetContainerReference(containerName);
+            blobClient = storageAccount.CreateCloudBlobClient();
+            
         }
 
         /// <summary>
@@ -46,9 +46,9 @@
         /// <param name="contentType">Type of the content.</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        public Task<string> UploadToBlob(byte[] data, string name, string contentType, bool overwrite = false)
+        public Task<string> UploadToBlob(byte[] data, string name, string contentType, string containerName, bool overwrite = false)
         {
-            return UploadToBlob(new MemoryStream(data), name, contentType);
+            return UploadToBlob(new MemoryStream(data), name, contentType, containerName);
         }
 
         /// <summary>
@@ -59,9 +59,9 @@
         /// <param name="contentType">Type of the content.</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        public Task<string> UploadToBlob(string data, string name, string contentType, bool overwrite = false)
+        public Task<string> UploadToBlob(string data, string name, string contentType, string containerName, bool overwrite = false)
         {
-            return UploadToBlob(new MemoryStream(Convert.FromBase64String(data)), name, contentType);
+            return UploadToBlob(new MemoryStream(Convert.FromBase64String(data)), name, contentType, containerName);
         }
 
         /// <summary>
@@ -73,8 +73,10 @@
         /// <param name="blobRequestOptions">The BLOB request options.</param>
         /// <param name="operationContext">The operation context.</param>
         /// <returns></returns>
-        public async Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext)
+        public async Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext, string containerName)
         {
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+
             var blob = blobContainer.GetBlockBlobReference(fileName);
             await blob.DeleteIfExistsAsync(deleteSnapshotsOption, accessCondition, blobRequestOptions, operationContext);
         }
@@ -84,8 +86,10 @@
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <returns></returns>
-        public async Task DestroyBlob(string fileName)
+        public async Task DestroyBlob(string fileName, string containerName)
         {
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+
             var blob = blobContainer.GetBlockBlobReference(fileName);
             await blob.DeleteIfExistsAsync();
         }
@@ -98,8 +102,12 @@
         /// <param name="contentType">Type of the content.</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        private async Task<string> UploadToBlob(Stream stream, string name, string contentType)
+        private async Task<string> UploadToBlob(Stream stream, string name, string contentType, string containerName)
         {
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+
+            await blobContainer.CreateIfNotExistsAsync();
+
             CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(name);
             if (!await blockBlob.ExistsAsync())
             {

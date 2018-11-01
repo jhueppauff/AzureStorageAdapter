@@ -17,8 +17,8 @@ namespace UnitTest
             string sample = System.IO.Directory.GetParent(AppContext.BaseDirectory).FullName + @"\Resources\sample.txt";
 
             var configuration = GetConfiguration(); 
-            BlobStorageAdapter blobStorageAdapter = new BlobStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value, configuration.GetSection("AzureBlogStorage:BlobContainer").Value);
-            string uri = await blobStorageAdapter.UploadToBlob(await File.ReadAllBytesAsync(sample), Guid.NewGuid() + ".txt", "text/plain", true);
+            BlobStorageAdapter blobStorageAdapter = new BlobStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+            string uri = await blobStorageAdapter.UploadToBlob(await File.ReadAllBytesAsync(sample), Guid.NewGuid() + ".txt", "text/plain", configuration.GetSection("AzureBlogStorage:BlobContainer").Value, true);
 
             Assert.IsTrue(!String.IsNullOrWhiteSpace(uri));
 

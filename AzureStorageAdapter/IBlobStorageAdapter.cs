@@ -12,9 +12,10 @@ namespace AzureStorageAdapter
         /// <param name="data">The data.</param>
         /// <param name="name">The name.</param>
         /// <param name="contentType">Type of the content.</param>
+        /// <param name="containerName">Container Name</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        Task<string> UploadToBlob(byte[] data, string name, string contentType, bool overwrite = false);
+        Task<string> UploadToBlob(byte[] data, string name, string contentType, string containerName, bool overwrite = false);
 
         /// <summary>
         /// Uploads to BLOB.
@@ -22,9 +23,10 @@ namespace AzureStorageAdapter
         /// <param name="data">The data.</param>
         /// <param name="name">The name.</param>
         /// <param name="contentType">Type of the content.</param>
+        /// <param name="containerName">Container Name</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        Task<string> UploadToBlob(string data, string name, string contentType, bool overwrite = false);
+        Task<string> UploadToBlob(string data, string name, string contentType, string containerName, bool overwrite = false);
 
         /// <summary>
         /// Destroys the BLOB.
@@ -34,14 +36,16 @@ namespace AzureStorageAdapter
         /// <param name="accessCondition">The access condition.</param>
         /// <param name="blobRequestOptions">The BLOB request options.</param>
         /// <param name="operationContext">The operation context.</param>
+        /// <param name="containerName">Container Name</param>
         /// <returns></returns>
-        Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext);
+        Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext, string containerName);
 
         /// <summary>
         /// Destroys the BLOB.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
+        /// <param name="containerName">Container Name</param>
         /// <returns></returns>
-        Task DestroyBlob(string fileName);
+        Task DestroyBlob(string fileName, string containerName);
     }
 }
