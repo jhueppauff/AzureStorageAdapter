@@ -22,6 +22,11 @@
         private readonly CloudBlobClient blobClient;
 
         /// <summary>
+        /// The prevent automatic creation of blob container
+        /// </summary>
+        private readonly bool preventAutoCreation = false;
+
+        /// <summary>
         /// Default SharedAccess Expiry Time for calls, overridable by subclasses
         /// </summary>
         protected virtual int DefaultSharedAccessExpiryTime => defaultSharedAccessExpiryTime;
@@ -30,12 +35,23 @@
         /// Initializes a new instance of the <see cref="BlobStorageAdapter"/> class.
         /// </summary>
         /// <param name="blobConnectionString">The BLOB connection string.</param>
-        /// <param name="containerName">Name of the container.</param>
         public BlobStorageAdapter(string blobConnectionString)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             blobClient = storageAccount.CreateCloudBlobClient();
             
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BlobStorageAdapter"/> class.
+        /// </summary>
+        /// <param name="blobConnectionString">The BLOB connection string.</param>
+        /// <param name="preventAutoCreation">Disables the Autocreation of blobs</param>
+        public BlobStorageAdapter(string blobConnectionString, bool preventAutoCreation)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            blobClient = storageAccount.CreateCloudBlobClient();
+            this.preventAutoCreation = preventAutoCreation;
         }
 
         /// <summary>
@@ -106,7 +122,10 @@
         {
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
 
-            await blobContainer.CreateIfNotExistsAsync();
+            if (!preventAutoCreation)
+            {
+                await blobContainer.CreateIfNotExistsAsync();
+            }
 
             CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(name);
             if (!await blockBlob.ExistsAsync())
