@@ -111,6 +111,19 @@
         }
 
         /// <summary>
+        /// Deletes the BLOB container.
+        /// </summary>
+        /// <param name="containerName">Name of the container.</param>
+        /// <returns><see cref="Task"/></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task DeleteBlobContainerAsync(string containerName)
+        {
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
+        }
+
+        /// <summary>
         /// Uploads to BLOB Storage.
         /// </summary>
         /// <param name="stream">The stream.</param>
@@ -118,7 +131,7 @@
         /// <param name="contentType">Type of the content.</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
         /// <returns></returns>
-        private async Task<string> UploadToBlob(Stream stream, string name, string contentType, string containerName)
+        private async Task<string> UploadToBlob(Stream stream, string name, string contentType, string containerName, bool createSAS = true, int overwriteSASTime = 0)
         {
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
 
@@ -137,7 +150,13 @@
             }
 
             string blobUri = blockBlob.Uri.ToString();
-            string blobSAS = blockBlob.GetSharedAccessSignature(GetSAS());
+
+            if (!createSAS)
+            {
+                return $"{blobUri}";
+            }
+            
+            string blobSAS = blockBlob.GetSharedAccessSignature(GetSAS(overwriteSASTime));
 
             return $"{blobUri}{blobSAS}";
         }
@@ -146,28 +165,23 @@
         /// Gets the SAS Token.
         /// </summary>
         /// <returns>Returns the <see cref="SharedAccessBlobPolicy"/></returns>
-        private SharedAccessBlobPolicy GetSAS()
+        private SharedAccessBlobPolicy GetSAS(int overwriteSASTime = 0)
         {
             SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy
             {
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(DefaultSharedAccessExpiryTime),
                 Permissions = SharedAccessBlobPermissions.Read
             };
 
+            if (overwriteSASTime == 0)
+            {
+                sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(DefaultSharedAccessExpiryTime);
+            }
+            else
+            {
+                sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(overwriteSASTime);
+            }
+
             return sasConstraints;
-        }
-
-        /// <summary>
-        /// Deletes the BLOB container.
-        /// </summary>
-        /// <param name="containerName">Name of the container.</param>
-        /// <returns><see cref="Task"/></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task DeleteBlobContainerAsync(string containerName)
-        {
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-
-            await container.DeleteIfExistsAsync();
         }
     }
 }
