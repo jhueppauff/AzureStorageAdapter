@@ -8,8 +8,10 @@
     <PackageProjectUrl>https://github.com/jhueppauff/AzureStorageAdapter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jhueppauff/AzureStorageAdapter</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
-    <PackageTags>.netstandard, azure</PackageTags>
+    <PackageTags>.NETStandard; Azure</PackageTags>
     <PackageId>Hueppauff.AzureStorageAdapter</PackageId>
+    <Description>Azure Cloud Storage Adapter to connect to the Storage Services</Description>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
