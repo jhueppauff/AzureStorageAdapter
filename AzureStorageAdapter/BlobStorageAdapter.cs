@@ -1,4 +1,12 @@
-﻿namespace AzureStorageAdapter
+//-----------------------------------------------------------------------
+// <copyright file="BlobStorageAdapter.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace AzureStorageAdapter
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
