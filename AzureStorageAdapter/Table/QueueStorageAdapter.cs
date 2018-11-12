@@ -1,4 +1,12 @@
-﻿namespace AzureStorageAdapter.Table
+﻿//-----------------------------------------------------------------------
+// <copyright file="QueueStorageAdapter.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace AzureStorageAdapter.Table
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
