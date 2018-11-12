@@ -1,8 +1,16 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System.Threading.Tasks;
+﻿//-----------------------------------------------------------------------
+// <copyright file="ITableStorageAdapter.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace AzureStorageAdapter
 {
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System.Threading.Tasks;
+
     interface ITableStorageAdapter
     {
         /// <summary>
