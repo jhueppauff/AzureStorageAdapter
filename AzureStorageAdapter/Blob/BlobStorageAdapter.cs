@@ -102,7 +102,7 @@ namespace AzureStorageAdapter.Blob
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
-            await blob.DeleteIfExistsAsync(deleteSnapshotsOption, accessCondition, blobRequestOptions, operationContext);
+            await blob.DeleteIfExistsAsync(deleteSnapshotsOption, accessCondition, blobRequestOptions, operationContext).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace AzureStorageAdapter.Blob
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
-            await blob.DeleteIfExistsAsync();
+            await blob.DeleteIfExistsAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace AzureStorageAdapter.Blob
         {
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 
-            await container.DeleteIfExistsAsync();
+            await container.DeleteIfExistsAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -145,15 +145,15 @@ namespace AzureStorageAdapter.Blob
 
             if (!preventAutoCreation)
             {
-                await blobContainer.CreateIfNotExistsAsync();
+                await blobContainer.CreateIfNotExistsAsync().ConfigureAwait(false);
             }
 
             CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(name);
-            if (!await blockBlob.ExistsAsync())
+            if (!await blockBlob.ExistsAsync().ConfigureAwait(false))
             {
-                await blockBlob.UploadFromStreamAsync(stream);
+                await blockBlob.UploadFromStreamAsync(stream).ConfigureAwait(false);
                 blockBlob.Properties.ContentType = contentType;
-                await blockBlob.SetPropertiesAsync();
+                await blockBlob.SetPropertiesAsync().ConfigureAwait(false);
 
             }
 

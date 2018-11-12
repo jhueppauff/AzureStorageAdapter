@@ -35,7 +35,7 @@ namespace AzureStorageAdapter.Table
         public async Task CreateNewTable(string tableName)
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
-            await cloudTable.CreateIfNotExistsAsync();
+            await cloudTable.CreateIfNotExistsAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace AzureStorageAdapter.Table
                 if (retrievedEntity == null)
                 {
                     TableOperation tableOperation = TableOperation.Insert(entity as TableEntity);
-                    await cloudTable.ExecuteAsync(tableOperation);
+                    await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
                 }
                 else if (throwErrorOnExistingRecord)
                 {
@@ -87,7 +87,7 @@ namespace AzureStorageAdapter.Table
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
             TableOperation tableOperation = TableOperation.Retrieve(entity.PartitionKey, entity.RowKey);
-            TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation);
+            TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
 
             return (TResponse)tableResult.Result;
         }
