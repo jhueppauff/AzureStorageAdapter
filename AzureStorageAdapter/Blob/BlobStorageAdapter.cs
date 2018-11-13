@@ -47,7 +47,6 @@ namespace AzureStorageAdapter.Blob
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             blobClient = storageAccount.CreateCloudBlobClient();
-
         }
 
         /// <summary>
@@ -154,7 +153,6 @@ namespace AzureStorageAdapter.Blob
                 await blockBlob.UploadFromStreamAsync(stream).ConfigureAwait(false);
                 blockBlob.Properties.ContentType = contentType;
                 await blockBlob.SetPropertiesAsync().ConfigureAwait(false);
-
             }
 
             string blobUri = blockBlob.Uri.ToString();
