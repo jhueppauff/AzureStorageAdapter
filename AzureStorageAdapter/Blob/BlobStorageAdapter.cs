@@ -14,7 +14,6 @@ namespace AzureStorageAdapter.Blob
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
-
     /// <summary>
     /// Blob Storage Adpater for Executing File Operations on the Azure Blob Storage
     /// </summary>
