@@ -8,10 +8,10 @@
 
 namespace AzureStorageAdapter.Table
 {
-    using Microsoft.WindowsAzure.Storage.Queue;
     using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage.Queue;
 
-    interface IQueueStorageAdapter
+    public interface IQueueStorageAdapter
     {
         Task CreateQueueAsync(string name);
 

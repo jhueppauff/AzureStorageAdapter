@@ -8,11 +8,14 @@
 
 namespace AzureStorageAdapter.Table
 {
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Queue;
     using System;
     using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Queue;
 
+    /// <summary>
+    /// Azure Storage Queue Adapter handling the most important operations
+    /// </summary>
     public class QueueStorageAdapter
     {
         private readonly CloudQueueClient queueClient;

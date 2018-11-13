@@ -8,11 +8,12 @@
 
 namespace AzureStorageAdapter.Blob
 {
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
     using System;
     using System.IO;
     using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
+
 
     /// <summary>
     /// Blob Storage Adpater for Executing File Operations on the Azure Blob Storage
@@ -22,7 +23,7 @@ namespace AzureStorageAdapter.Blob
         /// <summary>
         /// The default shared access expiry time
         /// </summary>
-        private const int defaultSharedAccessExpiryTime = 30;
+        private const int ConstDefaultSharedAccessExpiryTime = 30;
 
         /// <summary>
         /// The BLOB client
@@ -37,7 +38,7 @@ namespace AzureStorageAdapter.Blob
         /// <summary>
         /// Default SharedAccess Expiry Time for calls, overridable by subclasses
         /// </summary>
-        protected virtual int DefaultSharedAccessExpiryTime => defaultSharedAccessExpiryTime;
+        protected virtual int DefaultSharedAccessExpiryTime => ConstDefaultSharedAccessExpiryTime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlobStorageAdapter"/> class.

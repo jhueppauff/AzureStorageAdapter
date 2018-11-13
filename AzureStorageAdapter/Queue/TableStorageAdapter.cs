@@ -8,11 +8,15 @@
 
 namespace AzureStorageAdapter.Table
 {
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Table;
 
+    /// <summary>
+    /// Azure Table Storage Adapter handling the most important operations
+    /// </summary>
+    /// <seealso cref="AzureStorageAdapter.Table.ITableStorageAdapter" />
     public class TableStorageAdapter : ITableStorageAdapter
     {
         private readonly CloudTableClient cloudTableClient;
@@ -82,7 +86,7 @@ namespace AzureStorageAdapter.Table
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
-        public async Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity )
+        public async Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity)
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
