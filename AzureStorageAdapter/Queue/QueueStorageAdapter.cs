@@ -18,20 +18,38 @@ namespace AzureStorageAdapter.Queue
     /// </summary>
     public class QueueStorageAdapter
     {
+        /// <summary>
+        /// The Azure Queue Storage Client
+        /// </summary>
         private readonly CloudQueueClient queueClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QueueStorageAdapter"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
         public QueueStorageAdapter(string connectionString)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             queueClient = storageAccount.CreateCloudQueueClient();
         }
 
+        /// <summary>
+        /// Creates a new queue asynchronous.
+        /// </summary>
+        /// <param name="name">The name of the Queue.</param>
+        /// <returns></returns>
         public async Task CreateQueueAsync(string name)
         {
             CloudQueue queue = queueClient.GetQueueReference(name);
             await queue.CreateIfNotExistsAsync().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Adds an new entry to the queue asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <param name="messageText">The queue entry message text.</param>
+        /// <returns></returns>
         public async Task AddEntryToQueueAsync(string queueName, string messageText)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -40,6 +58,11 @@ namespace AzureStorageAdapter.Queue
             await queue.AddMessageAsync(message).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Peeks the next queue message asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns>Returns the Message Text of the next Queue Message Item as <see cref="string"/></returns>
         public async Task<string> PeekNextMessageStringAsync(string queueName)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -49,6 +72,11 @@ namespace AzureStorageAdapter.Queue
             return peekedMessage.AsString;
         }
 
+        /// <summary>
+        /// Peeks the next queue message asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns>Returns the next Queue Message Item</returns>
         public async Task<CloudQueueMessage> PeekNextMessageAsync(string queueName)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -58,6 +86,12 @@ namespace AzureStorageAdapter.Queue
             return peekedMessage;
         }
 
+        /// <summary>
+        /// Changes the message content asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <param name="messageContent">Content of the message.</param>
+        /// <returns></returns>
         public async Task ChangeMessageContentAsync(string queueName, string messageContent)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -67,6 +101,11 @@ namespace AzureStorageAdapter.Queue
             await queue.UpdateMessageAsync(message, TimeSpan.FromSeconds(20.0), MessageUpdateFields.Content | MessageUpdateFields.Visibility);
         }
 
+        /// <summary>
+        /// Removes the next message asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
         public async Task RemoveNextMessageAsync(string queueName)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -75,6 +114,11 @@ namespace AzureStorageAdapter.Queue
             await queue.DeleteMessageAsync(retrievedMessage).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Gets the queue length asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns>Returns the length <see cref="int"/> of the queue.</returns>
         public async Task<int> GetQueueLengthAsync(string queueName)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
@@ -86,6 +130,11 @@ namespace AzureStorageAdapter.Queue
             return queue.ApproximateMessageCount.Value;
         }
 
+        /// <summary>
+        /// Deletes the queue asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
         public async Task DeleteQueueAsync(string queueName)
         {
             CloudQueue queue = queueClient.GetQueueReference(queueName);
