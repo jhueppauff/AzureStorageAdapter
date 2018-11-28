@@ -6,7 +6,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace AzureStorageAdapter.Table
+namespace AzureStorageAdapter.Queue
 {
     using System;
     using System.Threading.Tasks;
