@@ -11,8 +11,7 @@ namespace AzureStorageAdapter.Blob
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-
-    
+   
     public interface IBlobStorageAdapter
     {
         /// <summary>
