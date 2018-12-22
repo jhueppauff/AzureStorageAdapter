@@ -38,5 +38,12 @@ namespace AzureStorageAdapter.Table
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
         Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity);
+
+        /// <summary>
+        /// Deletes a Table
+        /// </summary>
+        /// <param name="tableName">The Name of the Table to delete</param>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
+        Task DeleteTableAsync(string tableName);
     }
 }

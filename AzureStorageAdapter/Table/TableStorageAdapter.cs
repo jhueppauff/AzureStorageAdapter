@@ -43,6 +43,18 @@ namespace AzureStorageAdapter.Table
         }
 
         /// <summary>
+        /// Deletes a Table
+        /// </summary>
+        /// <param name="tableName">The Name of the Table to delete</param>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
+        public async Task DeleteTableAsync(string tableName)
+        {
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+
+            await cloudTable.DeleteIfExistsAsync();
+        }
+
+        /// <summary>
         /// Inserts the record to table.
         /// </summary>
         /// <typeparam name="TTableEntity">The type of the table entity.</typeparam>
