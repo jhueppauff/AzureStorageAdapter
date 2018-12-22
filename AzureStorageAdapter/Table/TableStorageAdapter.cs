@@ -105,6 +105,12 @@ namespace AzureStorageAdapter.Table
             TableOperation tableOperation = TableOperation.Retrieve(entity.PartitionKey, entity.RowKey);
             TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
 
+            // Issue is here 
+            if (tableResult.HttpStatusCode == 404)
+            {
+                return default(TResponse);
+            }
+
             return (TResponse)tableResult.Result;
         }
     }
