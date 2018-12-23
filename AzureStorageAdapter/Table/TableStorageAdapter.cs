@@ -77,7 +77,7 @@ namespace AzureStorageAdapter.Table
 
                 if (retrievedEntity == null)
                 {
-                    TableOperation tableOperation = TableOperation.Insert(entity as TableEntity);
+                    TableOperation tableOperation = TableOperation.InsertOrReplace(entity as TableEntity);
                     await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
                 }
                 else if (throwErrorOnExistingRecord)
@@ -112,6 +112,17 @@ namespace AzureStorageAdapter.Table
             }
 
             return (TResponse)tableResult.Result;
+        }
+
+        /// <summary>
+        /// Checks if a Table Exists
+        /// </summary>
+        /// <param name="tableName">The Name of the Table to check</param>
+        /// <returns>Returns <see cref="Task{bool}"/></returns>
+        public async Task<bool> TableExits(string tableName)
+        {
+            CloudTable cloudTable = cloudTableClient.GetTableReference("test");
+            return await cloudTable.ExistsAsync().ConfigureAwait(false);
         }
     }
 }

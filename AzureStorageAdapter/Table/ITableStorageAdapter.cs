@@ -45,5 +45,12 @@ namespace AzureStorageAdapter.Table
         /// <param name="tableName">The Name of the Table to delete</param>
         /// <returns>Returns <see cref="Task{void}"/></returns>
         Task DeleteTableAsync(string tableName);
+
+        /// <summary>
+        /// Checks if a Table Exists
+        /// </summary>
+        /// <param name="tableName">The Name of the Table to check</param>
+        /// <returns>Returns <see cref="Task{bool}"/></returns>
+        Task<bool> TableExits(string tableName);
     }
 }
