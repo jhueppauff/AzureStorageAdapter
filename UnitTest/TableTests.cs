@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace UnitTest
     public class TableTests
     {
         [TestMethod]
-        public async Task CreateTable()
+        public async Task CreateAndDeleteTable()
         {
             var configuration = GetConfiguration();
             TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
@@ -22,6 +23,14 @@ namespace UnitTest
             await tableStorageAdapter.CreateNewTable("test").ConfigureAwait(false);
 
             await tableStorageAdapter.DeleteTableAsync("test").ConfigureAwait(false);
+
+            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+            CloudTableClient cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
+
+            CloudTable cloudTable = cloudTableClient.GetTableReference("test");
+            var exists = await cloudTable.ExistsAsync().ConfigureAwait(false);
+
+            exists.Should().Equals(false);
         }
 
         [TestMethod]
