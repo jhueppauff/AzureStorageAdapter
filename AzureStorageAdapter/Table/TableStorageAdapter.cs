@@ -67,13 +67,13 @@ namespace AzureStorageAdapter.Table
         /// or
         /// Provided entity is not of the type TableEntity
         /// </exception>
-        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false)
+        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new() 
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
             if (entity is TableEntity)
             {
-                var retrievedEntity = RetrieveRecord<TTableEntity>(tableName, entity as TableEntity);
+                var retrievedEntity = await RetrieveRecord<TTableEntity>(tableName, entity as TableEntity).ConfigureAwait(false);
 
                 if (retrievedEntity == null)
                 {
@@ -98,11 +98,11 @@ namespace AzureStorageAdapter.Table
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
-        public async Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity)
+        public async Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity) where TResponse : TableEntity, new()
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
-            TableOperation tableOperation = TableOperation.Retrieve(entity.PartitionKey, entity.RowKey);
+            TableOperation tableOperation = TableOperation.Retrieve<TResponse>(entity.PartitionKey, entity.RowKey, null);
             TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
 
             // Issue is here 

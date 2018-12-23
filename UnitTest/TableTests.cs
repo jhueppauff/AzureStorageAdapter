@@ -32,10 +32,11 @@ namespace UnitTest
             var entity = new TableEntity() { PartitionKey = "partkey", RowKey = "rowkey" };
             await tableStorageAdapter.CreateNewTable("test").ConfigureAwait(false);
 
-            await tableStorageAdapter.InsertRecordToTable("test", entity);
-            var result = await tableStorageAdapter.RetrieveRecord<TableEntity>("test", entity);
+            await tableStorageAdapter.InsertRecordToTable("test", entity).ConfigureAwait(false);
+            var result = await tableStorageAdapter.RetrieveRecord<TableEntity>("test", entity).ConfigureAwait(false);
 
             result.Should().NotBeNull();
+            result.Should().BeOfType(typeof(TableEntity));
             result.Should().Equals(entity);
 
             await tableStorageAdapter.DeleteTableAsync("test").ConfigureAwait(false);

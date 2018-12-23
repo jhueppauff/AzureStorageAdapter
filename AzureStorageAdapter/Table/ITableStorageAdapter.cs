@@ -21,7 +21,7 @@ namespace AzureStorageAdapter.Table
         /// <param name="entity">The entity.</param>
         /// <param name="throwErrorOnExistingRecord">if set to <c>true</c> [throw error on existing record].</param>
         /// <returns></returns>
-        Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false);
+        Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new();
 
         /// <summary>
         /// Creates a new table.
@@ -37,7 +37,7 @@ namespace AzureStorageAdapter.Table
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
-        Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity);
+        Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity) where TResponse : TableEntity, new();
 
         /// <summary>
         /// Deletes a Table
