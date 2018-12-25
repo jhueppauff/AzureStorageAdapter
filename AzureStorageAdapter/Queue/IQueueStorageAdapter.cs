@@ -20,7 +20,7 @@ namespace AzureStorageAdapter.Queue
         /// Creates a new queue asynchronous.
         /// </summary>
         /// <param name="name">The name of the Queue.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task CreateQueueAsync(string name);
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace AzureStorageAdapter.Queue
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <param name="messageText">The queue entry message text.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task AddEntryToQueueAsync(string queueName, string messageText);
 
         /// <summary>
@@ -50,14 +50,14 @@ namespace AzureStorageAdapter.Queue
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <param name="messageContent">Content of the message.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task ChangeMessageContentAsync(string queueName, string messageContent);
 
         /// <summary>
         /// Removes the next message asynchronous.
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task RemoveNextMessageAsync(string queueName);
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace AzureStorageAdapter.Queue
         /// Deletes the queue asynchronous.
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task DeleteQueueAsync(string queueName);
     }
 }

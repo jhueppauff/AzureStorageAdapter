@@ -15,7 +15,7 @@ namespace AzureStorageAdapter.Blob
     using Microsoft.WindowsAzure.Storage.Blob;
 
     /// <summary>
-    /// Blob Storage Adpater for Executing File Operations on the Azure Blob Storage
+    /// Blob Storage Adapter for Executing File Operations on the Azure Blob Storage
     /// </summary>
     public class BlobStorageAdapter : IBlobStorageAdapter
     {
@@ -33,12 +33,7 @@ namespace AzureStorageAdapter.Blob
         /// The prevent automatic creation of blob container
         /// </summary>
         private readonly bool preventAutoCreation = false;
-
-        /// <summary>
-        /// Default SharedAccess Expiry Time for calls, overridable by subclasses
-        /// </summary>
-        protected virtual int DefaultSharedAccessExpiryTime => ConstDefaultSharedAccessExpiryTime;
-
+ 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlobStorageAdapter"/> class.
         /// </summary>
@@ -46,7 +41,7 @@ namespace AzureStorageAdapter.Blob
         public BlobStorageAdapter(string blobConnectionString)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            blobClient = storageAccount.CreateCloudBlobClient();
+            this.blobClient = storageAccount.CreateCloudBlobClient();
         }
 
         /// <summary>
@@ -57,21 +52,27 @@ namespace AzureStorageAdapter.Blob
         public BlobStorageAdapter(string blobConnectionString, bool preventAutoCreation)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            blobClient = storageAccount.CreateCloudBlobClient();
+            this.blobClient = storageAccount.CreateCloudBlobClient();
             this.preventAutoCreation = preventAutoCreation;
         }
 
         /// <summary>
+        /// Default SharedAccess Expiry Time for calls, overridable by subclasses
+        /// </summary>
+        protected virtual int DefaultSharedAccessExpiryTime => ConstDefaultSharedAccessExpiryTime;
+
+        /// <summary>
         /// Uploads to BLOB Storage.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="name">The name.</param>
         /// <param name="contentType">Type of the content.</param>
+        /// <param name="containerName">Container name</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task{String}"/></returns>
         public Task<string> UploadToBlob(byte[] data, string name, string contentType, string containerName, bool overwrite = false)
         {
-            return UploadToBlob(new MemoryStream(data), name, contentType, containerName);
+            return this.UploadToBlob(new MemoryStream(data), name, contentType, containerName);
         }
 
         /// <summary>
@@ -80,11 +81,12 @@ namespace AzureStorageAdapter.Blob
         /// <param name="data">The data.</param>
         /// <param name="name">The name.</param>
         /// <param name="contentType">Type of the content.</param>
+        /// <param name="containerName">Name of the Azure Blob Container</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task{String}"/>the URL with SAS Token.</returns>
         public Task<string> UploadToBlob(string data, string name, string contentType, string containerName, bool overwrite = false)
         {
-            return UploadToBlob(new MemoryStream(Convert.FromBase64String(data)), name, contentType, containerName);
+            return this.UploadToBlob(new MemoryStream(Convert.FromBase64String(data)), name, contentType, containerName);
         }
 
         /// <summary>
@@ -95,10 +97,11 @@ namespace AzureStorageAdapter.Blob
         /// <param name="accessCondition">The access condition.</param>
         /// <param name="blobRequestOptions">The BLOB request options.</param>
         /// <param name="operationContext">The operation context.</param>
-        /// <returns></returns>
+        /// <param name="containerName">Name of the Azure Blob Storage Container</param>
+        /// <returns>Returns <see cref="Task"/></returns>
         public async Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext, string containerName)
         {
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer blobContainer = this.blobClient.GetContainerReference(containerName);
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
             await blob.DeleteIfExistsAsync(deleteSnapshotsOption, accessCondition, blobRequestOptions, operationContext).ConfigureAwait(false);
@@ -108,10 +111,11 @@ namespace AzureStorageAdapter.Blob
         /// Destroys the BLOB.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        /// <returns></returns>
+        /// <param name="containerName">Name of the Azure Blob Storage Container</param>
+        /// <returns>Returns <see cref="Task"/></returns>
         public async Task DestroyBlob(string fileName, string containerName)
         {
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer blobContainer = this.blobClient.GetContainerReference(containerName);
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
             await blob.DeleteIfExistsAsync().ConfigureAwait(false);
@@ -121,11 +125,10 @@ namespace AzureStorageAdapter.Blob
         /// Deletes the BLOB container.
         /// </summary>
         /// <param name="containerName">Name of the container.</param>
-        /// <returns><see cref="Task"/></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <returns>Returns <see cref="Task"/></returns>
         public async Task DeleteBlobContainerAsync(string containerName)
         {
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer container = this.blobClient.GetContainerReference(containerName);
 
             await container.DeleteIfExistsAsync().ConfigureAwait(false);
         }
@@ -136,13 +139,15 @@ namespace AzureStorageAdapter.Blob
         /// <param name="stream">The stream.</param>
         /// <param name="name">The name.</param>
         /// <param name="contentType">Type of the content.</param>
-        /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        /// <returns></returns>
+        /// <param name="containerName">Name of the Azure Blob Storage Container</param>
+        /// <param name="createSAS">if set <c>true</c> [a SAS Token will be created]</param>
+        /// <param name="overwriteSASTime">Overwrite the default SAS Token Lifetime.</param>
+        /// <returns>Returns the URI with optional SAS Token as <see cref="Task{String}"/></returns>
         private async Task<string> UploadToBlob(Stream stream, string name, string contentType, string containerName, bool createSAS = true, int overwriteSASTime = 0)
         {
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer blobContainer = this.blobClient.GetContainerReference(containerName);
 
-            if (!preventAutoCreation)
+            if (!this.preventAutoCreation)
             {
                 await blobContainer.CreateIfNotExistsAsync().ConfigureAwait(false);
             }
@@ -161,8 +166,8 @@ namespace AzureStorageAdapter.Blob
             {
                 return $"{blobUri}";
             }
-            
-            string blobSAS = blockBlob.GetSharedAccessSignature(GetSAS(overwriteSASTime));
+
+            string blobSAS = blockBlob.GetSharedAccessSignature(this.GetSAS(overwriteSASTime));
 
             return $"{blobUri}{blobSAS}";
         }
@@ -170,6 +175,7 @@ namespace AzureStorageAdapter.Blob
         /// <summary>
         /// Gets the SAS Token.
         /// </summary>
+        /// <param name="overwriteSASTime">If set, this will overwrite the Default SAS Token Lifetime (Value in minutes)</param>
         /// <returns>Returns the <see cref="SharedAccessBlobPolicy"/></returns>
         private SharedAccessBlobPolicy GetSAS(int overwriteSASTime = 0)
         {
@@ -180,7 +186,7 @@ namespace AzureStorageAdapter.Blob
 
             if (overwriteSASTime == 0)
             {
-                sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(DefaultSharedAccessExpiryTime);
+                sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(this.DefaultSharedAccessExpiryTime);
             }
             else
             {

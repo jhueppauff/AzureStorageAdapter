@@ -8,8 +8,14 @@
 
 namespace AzureStorageAdapter.Table.Exceptions
 {
+    /// <summary>
+    /// Table Constants 
+    /// </summary>
     public class Constants
     {
+        /// <summary>
+        /// Message Text used in the Table Storage Client
+        /// </summary>
         public const string TableDoesNotExistsExceptionMessage = "Provided Table \"{0}\" not found! Please provide a valid Table Name or validate the Storage ConnectionString";
     }
 }
