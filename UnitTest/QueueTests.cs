@@ -1,4 +1,12 @@
-﻿namespace UnitTest
+﻿//-----------------------------------------------------------------------
+// <copyright file="QueueTests.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace UnitTest
 {
     using AzureStorageAdapter.Queue;
     using FluentAssertions;

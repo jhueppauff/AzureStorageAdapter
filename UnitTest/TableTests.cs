@@ -1,4 +1,12 @@
-﻿namespace UnitTest
+﻿//-----------------------------------------------------------------------
+// <copyright file="TableTests.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace UnitTest
 {
     using AzureStorageAdapter.Table;
     using FluentAssertions;
@@ -30,13 +38,13 @@
 
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
 
-            var exists = await tableStorageAdapter.TableExits(tableName);
+            var exists = await tableStorageAdapter.TableExists(tableName);
 
             exists.Should().Equals(true);
 
             await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
 
-            exists = await tableStorageAdapter.TableExits(tableName);
+            exists = await tableStorageAdapter.TableExists(tableName);
 
             exists.Should().Equals(false);
         }
@@ -48,7 +56,7 @@
             
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
 
-            var exists = await tableStorageAdapter.TableExits(tableName);
+            var exists = await tableStorageAdapter.TableExists(tableName);
             exists.Should().Equals(true);
 
             await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
@@ -59,7 +67,7 @@
         {
             string tableName = "notexiststest" + DateTime.Now.Second;
            
-            var exists = await tableStorageAdapter.TableExits(tableName);
+            var exists = await tableStorageAdapter.TableExists(tableName);
             exists.Should().Equals(false);
         }
 
