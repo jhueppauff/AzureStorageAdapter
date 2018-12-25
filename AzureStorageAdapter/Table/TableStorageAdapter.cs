@@ -60,6 +60,7 @@ namespace AzureStorageAdapter.Table
         /// <typeparam name="TTableEntity">The type of the table entity.</typeparam>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
+        /// <param name="autoCreateTable">if set to <c>true</c> the table will be created if it does not exists</param>
         /// <param name="throwErrorOnExistingRecord">if set to <c>true</c> [throw error on existing record].</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException">
@@ -67,9 +68,25 @@ namespace AzureStorageAdapter.Table
         /// or
         /// Provided entity is not of the type TableEntity
         /// </exception>
-        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new() 
+        /// <exception cref="Exceptions.TableDoesNotExistsException">
+        /// Provided Table does not exists
+        /// </exception>
+        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool autoCreateTable = false, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new() 
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+
+            bool exists = await TableExists(tableName).ConfigureAwait(false);
+
+            if (autoCreateTable is true && exists is false)
+            {
+                await CreateNewTable(tableName).ConfigureAwait(false);
+            }
+
+            // Throw Error if table does not exists and auto create is not enabled
+            if (exists is false && autoCreateTable is false)
+            {
+                throw new Exceptions.TableDoesNotExistsException(string.Format(Exceptions.Constants.TableDoesNotExistsExceptionMessage, tableName));
+            }
 
             if (entity is TableEntity)
             {
@@ -119,7 +136,7 @@ namespace AzureStorageAdapter.Table
         /// </summary>
         /// <param name="tableName">The Name of the Table to check</param>
         /// <returns>Returns <see cref="Task{bool}"/></returns>
-        public async Task<bool> TableExits(string tableName)
+        public async Task<bool> TableExists(string tableName)
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference("test");
             return await cloudTable.ExistsAsync().ConfigureAwait(false);
