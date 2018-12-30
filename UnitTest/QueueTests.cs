@@ -31,5 +31,23 @@
             message.AsString.Should().Equals("test");
         }
 
+        [TestMethod]
+        public async Task GetQueueCount()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                await queueStorageAdapter.AddEntryToQueueAsync(queueName, i.ToString()).ConfigureAwait(false);
+            }
+            
+            var queueLength = await queueStorageAdapter.GetQueueLengthAsync(queueName).ConfigureAwait(false);
+
+            queueLength.Should().Equals(10);
+        }
+
+        [TestCleanup]
+        public async Task Cleanup()
+        {
+            await queueStorageAdapter.DeleteQueueAsync(queueName).ConfigureAwait(false);
+        }
     }
 }
