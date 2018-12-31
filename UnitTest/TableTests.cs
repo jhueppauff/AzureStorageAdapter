@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="TableTests.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
 // Copyright 2018 Jhueppauff
 // MIT License 
@@ -12,8 +12,8 @@ namespace UnitTest
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
+    using Microsoft.WindowsAzure.Storage;
     using System;
     using System.Collections.Generic;
     using System.Text;
@@ -22,18 +22,19 @@ namespace UnitTest
     [TestClass]
     public class TableTests
     {
-        private TableStorageAdapter tableStorageAdapter;
+        private IConfiguration configuration;
 
         [TestInitialize]
         public void Initialize()
         {
-            var configuration = GetConfiguration();
-            tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+            this.configuration = Configuration.GetConfiguration();
         }
 
         [TestMethod]
         public async Task CreateAndDeleteTable()
-        {           
+        {
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
             string tableName = "createtest" + DateTime.Now.Second;
 
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
@@ -53,7 +54,9 @@ namespace UnitTest
         public async Task TableExits_Should_Return_True_If_Table_Exits()
         {
             string tableName = "existstest" + DateTime.Now.Second;
-            
+
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
 
             var exists = await tableStorageAdapter.TableExists(tableName);
@@ -66,8 +69,9 @@ namespace UnitTest
         public async Task TableExits_Should_Return_False_If_Table_Does_Not_Exits()
         {
             string tableName = "notexiststest" + DateTime.Now.Second;
-           
-            var exists = await tableStorageAdapter.TableExists(tableName);
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
+            var exists = await tableStorageAdapter.TableExits(tableName);
             exists.Should().Equals(false);
         }
 
@@ -75,6 +79,7 @@ namespace UnitTest
         public async Task InsertTable()
         {
             string tableName = "inserttest" + DateTime.Now.Second;
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
 
             var entity = new TableEntity() { PartitionKey = "partkey", RowKey = "rowkey" };
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);

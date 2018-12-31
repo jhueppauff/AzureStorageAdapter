@@ -1,4 +1,7 @@
-﻿//-----------------------------------------------------------------------
+namespace UnitTest
+{
+    using System.Threading.Tasks;
+//-----------------------------------------------------------------------
 // <copyright file="QueueTests.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
 // Copyright 2018 Jhueppauff
 // MIT License 
@@ -8,23 +11,34 @@
 
 namespace UnitTest
 {
+    using System;
+    using System.Threading.Tasks;
     using AzureStorageAdapter.Queue;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class QueueTests
     {
+        private const string queueName = "sdktest";
+        private QueueStorageAdapter queueStorageAdapter;
         private IConfiguration configuration;
-        private const string QueueName = "test";
-        private QueueStorageAdapter queue;
 
         [TestInitialize]
         public async Task Initialize()
         {
+            this.configuration = Configuration.GetConfiguration();
+            this.queueStorageAdapter = new QueueStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+            await this.queueStorageAdapter.CreateQueueAsync(queueName);
+        }
+
+        [TestMethod]
+        public async Task AddEntry()
+        {
+            await queueStorageAdapter.AddEntryToQueueAsync(queueName, "test").ConfigureAwait(false);
+
+            var message = await queueStorageAdapter.PeekNextMessageAsync(queueName).ConfigureAwait(false);
             this.configuration = this.GetConfiguration();
             this.queue = new QueueStorageAdapter(this.configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
             await this.queue.CreateQueueAsync(QueueName);
@@ -40,19 +54,23 @@ namespace UnitTest
             message.AsString.Should().Equals("test");
         }
 
-        [TestCleanup]
-        public async Task Dispose()
+        [TestMethod]
+        public async Task GetQueueCount()
         {
-            await this.queue.DeleteQueueAsync(QueueName);
-            this.queue = null;
-            this.configuration = null;
+            for (int i = 0; i < 10; i++)
+            {
+                await queueStorageAdapter.AddEntryToQueueAsync(queueName, i.ToString()).ConfigureAwait(false);
+            }
+            
+            var queueLength = await queueStorageAdapter.GetQueueLengthAsync(queueName).ConfigureAwait(false);
+
+            queueLength.Should().Equals(10);
         }
 
-        private IConfiguration GetConfiguration()
+        [TestCleanup]
+        public async Task Cleanup()
         {
-            return new ConfigurationBuilder()
-                .SetBasePath(System.IO.Directory.GetParent(AppContext.BaseDirectory).FullName)
-                .AddJsonFile("appsettings.json", false).Build();
+            await queueStorageAdapter.DeleteQueueAsync(queueName).ConfigureAwait(false);
         }
     }
 }
