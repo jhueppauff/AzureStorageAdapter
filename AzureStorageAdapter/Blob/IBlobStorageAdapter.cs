@@ -7,11 +7,14 @@
 //-----------------------------------------------------------------------
 
 namespace AzureStorageAdapter.Blob
-{ 
+{
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-   
+
+    /// <summary>
+    /// Interface of the <see cref="BlobStorageAdapter"/> Class.
+    /// </summary>
     public interface IBlobStorageAdapter
     {
         /// <summary>
@@ -22,7 +25,7 @@ namespace AzureStorageAdapter.Blob
         /// <param name="contentType">Type of the content.</param>
         /// <param name="containerName">Container Name</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        /// <returns></returns>
+        /// <returns>Returns the Blob Uri as <see cref="Task{String}"/></returns>
         Task<string> UploadToBlob(byte[] data, string name, string contentType, string containerName, bool overwrite = false);
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace AzureStorageAdapter.Blob
         /// <param name="contentType">Type of the content.</param>
         /// <param name="containerName">Container Name</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        /// <returns></returns>
+        /// <returns>Returns the Blob Uri as <see cref="Task{String}"/></returns>
         Task<string> UploadToBlob(string data, string name, string contentType, string containerName, bool overwrite = false);
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace AzureStorageAdapter.Blob
         /// <param name="blobRequestOptions">The BLOB request options.</param>
         /// <param name="operationContext">The operation context.</param>
         /// <param name="containerName">Container Name</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task DestroyBlob(string fileName, DeleteSnapshotsOption deleteSnapshotsOption, AccessCondition accessCondition, BlobRequestOptions blobRequestOptions, OperationContext operationContext, string containerName);
 
         /// <summary>
@@ -53,14 +56,14 @@ namespace AzureStorageAdapter.Blob
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="containerName">Container Name</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task DestroyBlob(string fileName, string containerName);
 
         /// <summary>
         /// Deletes the BLOB container.
         /// </summary>
         /// <param name="containerName">Name of the container.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task"/></returns>
         Task DeleteBlobContainerAsync(string containerName);
     }
 }

@@ -16,9 +16,12 @@ namespace AzureStorageAdapter.Table
     /// <summary>
     /// Azure Table Storage Adapter handling the most important operations
     /// </summary>
-    /// <seealso cref="AzureStorageAdapter.Table.ITableStorageAdapter" />
+    /// <seealso cref="ITableStorageAdapter" />
     public class TableStorageAdapter : ITableStorageAdapter
     {
+        /// <summary>
+        /// Azure Cloud Table Client
+        /// </summary>
         private readonly CloudTableClient cloudTableClient;
 
         /// <summary>
@@ -28,17 +31,17 @@ namespace AzureStorageAdapter.Table
         public TableStorageAdapter(string connectionString)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
-            cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
+            this.cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
         }
 
         /// <summary>
         /// Creates a new table.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
         public async Task CreateNewTable(string tableName)
         {
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            CloudTable cloudTable = this.cloudTableClient.GetTableReference(tableName);
             await cloudTable.CreateIfNotExistsAsync().ConfigureAwait(false);
         }
 
@@ -49,7 +52,7 @@ namespace AzureStorageAdapter.Table
         /// <returns>Returns <see cref="Task{void}"/></returns>
         public async Task DeleteTableAsync(string tableName)
         {
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            CloudTable cloudTable = this.cloudTableClient.GetTableReference(tableName);
 
             await cloudTable.DeleteIfExistsAsync();
         }
@@ -60,20 +63,37 @@ namespace AzureStorageAdapter.Table
         /// <typeparam name="TTableEntity">The type of the table entity.</typeparam>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
+        /// <param name="autoCreateTable">if set to <c>true</c> the table will be created if it does not exists</param>
         /// <param name="throwErrorOnExistingRecord">if set to <c>true</c> [throw error on existing record].</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
         /// <exception cref="ArgumentException">
         /// Provided entity does already exist
         /// or
         /// Provided entity is not of the type TableEntity
         /// </exception>
-        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new() 
+        /// <exception cref="Exceptions.TableDoesNotExistsException">
+        /// Provided Table does not exists
+        /// </exception>
+        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool autoCreateTable = false, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new()
         {
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            CloudTable cloudTable = this.cloudTableClient.GetTableReference(tableName);
+
+            bool exists = await this.TableExists(tableName).ConfigureAwait(false);
+
+            if (autoCreateTable is true && exists is false)
+            {
+                await this.CreateNewTable(tableName).ConfigureAwait(false);
+            }
+
+            // Throw Error if table does not exists and auto create is not enabled
+            if (exists is false && autoCreateTable is false)
+            {
+                throw new Exceptions.TableDoesNotExistsException(string.Format(Exceptions.Constants.TableDoesNotExistsExceptionMessage, tableName));
+            }
 
             if (entity is TableEntity)
             {
-                var retrievedEntity = await RetrieveRecord<TTableEntity>(tableName, entity as TableEntity).ConfigureAwait(false);
+                var retrievedEntity = await this.RetrieveRecord<TTableEntity>(tableName, entity as TableEntity).ConfigureAwait(false);
 
                 if (retrievedEntity == null)
                 {
@@ -97,10 +117,10 @@ namespace AzureStorageAdapter.Table
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
-        /// <returns></returns>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
         public async Task<TResponse> RetrieveRecord<TResponse>(string tableName, TableEntity entity) where TResponse : TableEntity, new()
         {
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            CloudTable cloudTable = this.cloudTableClient.GetTableReference(tableName);
 
             TableOperation tableOperation = TableOperation.Retrieve<TResponse>(entity.PartitionKey, entity.RowKey, null);
             TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
@@ -119,9 +139,9 @@ namespace AzureStorageAdapter.Table
         /// </summary>
         /// <param name="tableName">The Name of the Table to check</param>
         /// <returns>Returns <see cref="Task{bool}"/></returns>
-        public async Task<bool> TableExits(string tableName)
+        public async Task<bool> TableExists(string tableName)
         {
-            CloudTable cloudTable = cloudTableClient.GetTableReference("test");
+            CloudTable cloudTable = this.cloudTableClient.GetTableReference("test");
             return await cloudTable.ExistsAsync().ConfigureAwait(false);
         }
     }

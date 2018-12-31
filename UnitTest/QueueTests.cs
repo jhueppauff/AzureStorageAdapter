@@ -1,5 +1,17 @@
-﻿namespace UnitTest
+namespace UnitTest
 {
+    using System.Threading.Tasks;
+//-----------------------------------------------------------------------
+// <copyright file="QueueTests.cs" company="https://github.com/jhueppauff/AzureStorageAdapter">
+// Copyright 2018 Jhueppauff
+// MIT License 
+// For licence details visit https://github.com/jhueppauff/AzureStorageAdapter/blob/master/LICENSE
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace UnitTest
+{
+    using System;
     using System.Threading.Tasks;
     using AzureStorageAdapter.Queue;
     using FluentAssertions;
@@ -27,6 +39,17 @@
             await queueStorageAdapter.AddEntryToQueueAsync(queueName, "test").ConfigureAwait(false);
 
             var message = await queueStorageAdapter.PeekNextMessageAsync(queueName).ConfigureAwait(false);
+            this.configuration = this.GetConfiguration();
+            this.queue = new QueueStorageAdapter(this.configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+            await this.queue.CreateQueueAsync(QueueName);
+        }
+
+        [TestMethod]
+        public async Task QueueMessage()
+        {
+            await this.queue.AddEntryToQueueAsync(QueueName, "test");
+
+            var message = await this.queue.PeekNextMessageAsync(QueueName);
 
             message.AsString.Should().Equals("test");
         }
