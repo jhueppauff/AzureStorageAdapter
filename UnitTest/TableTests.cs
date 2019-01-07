@@ -90,7 +90,8 @@
             TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", "rowkey")
             {
                 CustomInt = 1,
-                CustomString = "string"
+                CustomString = "string",
+                CustomDateTime = DateTime.Now
             };
 
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
@@ -101,6 +102,33 @@
             result.Should().NotBeNull();
             result.Should().BeOfType(typeof(TableStorageCustomEntity));
             result.Should().Equals(customEntity);
+
+            await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
+        }
+
+        [TestMethod]
+        public async Task Update_Record()
+        {
+            string tableName = "updatetest" + DateTime.Now.Second;
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
+            TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", "rowkey")
+            {
+                CustomInt = 1,
+                CustomString = "string",
+                CustomDateTime = DateTime.Now
+            };
+
+            await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
+
+            await tableStorageAdapter.InsertRecordToTable(tableName, customEntity).ConfigureAwait(false);
+          
+            customEntity.CustomString = "newstring";
+
+            await tableStorageAdapter.InsertRecordToTable(tableName, customEntity).ConfigureAwait(false);
+
+            var result = await tableStorageAdapter.RetrieveRecord<TableStorageCustomEntity>(tableName, customEntity).ConfigureAwait(false);
+            result.CustomString.Should().Equals("newstring");
 
             await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
         }

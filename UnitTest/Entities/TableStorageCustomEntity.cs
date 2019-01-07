@@ -18,5 +18,9 @@ namespace UnitTest.Entities
         public string CustomString { get; set; }
 
         public int CustomInt { get; set; }
+
+        public DateTime CustomDateTime { get; set; }
+
+        public string NullValue { get; set; }
     }
 }
