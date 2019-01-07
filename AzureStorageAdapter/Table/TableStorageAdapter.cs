@@ -84,6 +84,11 @@ namespace AzureStorageAdapter.Table
                 {
                     throw new ArgumentException("Provided entity does already exist");
                 }
+                else
+                {
+                    TableOperation tableOperation = TableOperation.Replace(entity as TableEntity);
+                    await cloudTable.ExecuteAsync(tableOperation).ConfigureAwait(false);
+                }
             }
             else
             {

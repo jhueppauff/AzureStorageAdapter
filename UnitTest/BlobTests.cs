@@ -1,10 +1,9 @@
-using AzureStorageAdapter.Blob;
-using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using AzureStorageAdapter.Blob;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest
 {
@@ -16,7 +15,7 @@ namespace UnitTest
         {
             string sample = System.IO.Directory.GetParent(AppContext.BaseDirectory).FullName + @"\Resources\sample.txt";
 
-            var configuration = GetConfiguration(); 
+            var configuration = Configuration.GetConfiguration(); 
             BlobStorageAdapter blobStorageAdapter = new BlobStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
             string uri = await blobStorageAdapter.UploadToBlob(await File.ReadAllBytesAsync(sample), Guid.NewGuid() + ".txt", "text/plain", configuration.GetSection("AzureBlogStorage:BlobContainer").Value, true);
 
@@ -38,13 +37,6 @@ namespace UnitTest
             var fileInfo = new FileInfo(path);
 
             Assert.IsTrue(fileInfo.Length != 0);
-        }
-
-        private IConfiguration GetConfiguration()
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(System.IO.Directory.GetParent(AppContext.BaseDirectory).FullName)
-                .AddJsonFile("appsettings.json", false).Build();
         }
     }
 }
