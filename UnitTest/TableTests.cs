@@ -7,6 +7,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.WindowsAzure.Storage.Table;
+    using UnitTest.Entities;
 
     [TestClass]
     public class TableTests
@@ -76,6 +77,30 @@
             result.Should().NotBeNull();
             result.Should().BeOfType(typeof(TableEntity));
             result.Should().Equals(entity);
+
+            await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
+        }
+
+        [TestMethod]
+        public async Task Insert_CustomEntity_Into_Table()
+        {
+            string tableName = "insertcustomtest" + DateTime.Now.Second;
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
+            TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", "rowkey")
+            {
+                CustomInt = 1,
+                CustomString = "string"
+            };
+
+            await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
+
+            await tableStorageAdapter.InsertRecordToTable(tableName, customEntity).ConfigureAwait(false);
+            var result = await tableStorageAdapter.RetrieveRecord<TableStorageCustomEntity>(tableName, customEntity).ConfigureAwait(false);
+
+            result.Should().NotBeNull();
+            result.Should().BeOfType(typeof(TableStorageCustomEntity));
+            result.Should().Equals(customEntity);
 
             await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
         }
