@@ -24,6 +24,16 @@ namespace AzureStorageAdapter.Table
         Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new();
 
         /// <summary>
+        /// Executes a Insert Batch Operation.
+        /// </summary>
+        /// <typeparam name="TTableEntity">Type of the Table Entity</typeparam>
+        /// <param name="tableName">Name of the Table</param>
+        /// <param name="entities">Array of the Entities to add to the Insert Operation</param>
+        /// <param name="merge">If set true, Entities will be merged</param>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
+        Task ExcuteBatchOperationToTable<TTableEntity>(string tableName, TTableEntity[] entities, bool merge = false) where TTableEntity : TableEntity, new();
+
+        /// <summary>
         /// Creates a new table.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>

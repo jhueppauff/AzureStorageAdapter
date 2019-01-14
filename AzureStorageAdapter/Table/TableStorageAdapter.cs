@@ -55,6 +55,41 @@ namespace AzureStorageAdapter.Table
         }
 
         /// <summary>
+        /// Executes a Insert Batch Operation.
+        /// </summary>
+        /// <typeparam name="TTableEntity">Type of the Table Entity</typeparam>
+        /// <param name="tableName">Name of the Table</param>
+        /// <param name="entities">Array of the Entities to add to the Insert Operation</param>
+        /// <param name="merge">If set true, Entities will be merged</param>
+        /// <returns>Returns <see cref="Task{void}"/></returns>
+        /// <returns></returns>
+        public async Task ExcuteBatchOperationToTable<TTableEntity>(string tableName, TTableEntity[] entities, bool merge = false) where TTableEntity : TableEntity, new()
+        {
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+
+            if (entities is TableEntity[])
+            {
+                // Create the batch operation.
+                TableBatchOperation batchOperation = new TableBatchOperation();
+
+                foreach (var entity in entities)
+                {
+                    if (merge)
+                    {
+                        batchOperation.InsertOrMerge(entity);
+                    }
+                    else
+                    {
+                        batchOperation.InsertOrReplace(entity);
+                    }
+                }
+
+                await cloudTable.ExecuteBatchAsync(batchOperation).ConfigureAwait(false);
+            }
+
+        }
+
+        /// <summary>
         /// Inserts the record to table.
         /// </summary>
         /// <typeparam name="TTableEntity">The type of the table entity.</typeparam>
@@ -67,7 +102,7 @@ namespace AzureStorageAdapter.Table
         /// or
         /// Provided entity is not of the type TableEntity
         /// </exception>
-        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new() 
+        public async Task InsertRecordToTable<TTableEntity>(string tableName, TTableEntity entity, bool throwErrorOnExistingRecord = false) where TTableEntity : TableEntity, new()
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
