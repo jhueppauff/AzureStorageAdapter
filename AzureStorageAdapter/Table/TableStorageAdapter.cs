@@ -86,7 +86,6 @@ namespace AzureStorageAdapter.Table
 
                 await cloudTable.ExecuteBatchAsync(batchOperation).ConfigureAwait(false);
             }
-
         }
 
         /// <summary>
