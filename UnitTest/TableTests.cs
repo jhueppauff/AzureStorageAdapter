@@ -107,6 +107,48 @@
         }
 
         [TestMethod]
+        public async Task Insert_Batch_CustomEntity_Into_Table()
+        {
+            string tableName = "insertbatchcustomtest" + DateTime.Now.Second;
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
+            TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", "rowkey")
+            {
+                CustomInt = 1,
+                CustomString = "string",
+                CustomDateTime = DateTime.Now
+            };
+
+            TableStorageCustomEntity customEntity2 = new TableStorageCustomEntity("partkey", "rowkey1")
+            {
+                CustomInt = 2,
+                CustomString = "string",
+                CustomDateTime = DateTime.Now
+            };
+
+            TableStorageCustomEntity[] entities = new TableStorageCustomEntity[2];
+            entities[0] = customEntity;
+            entities[1] = customEntity2;
+
+            await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
+
+            await tableStorageAdapter.ExcuteBatchOperationToTable(tableName, entities).ConfigureAwait(false);
+
+            var result = await tableStorageAdapter.RetrieveRecord<TableStorageCustomEntity>(tableName, customEntity).ConfigureAwait(false);
+            var result2 = await tableStorageAdapter.RetrieveRecord<TableStorageCustomEntity>(tableName, customEntity).ConfigureAwait(false);
+
+            result.Should().NotBeNull();
+            result.Should().BeOfType(typeof(TableStorageCustomEntity));
+            result.Should().Equals(customEntity);
+
+            result2.Should().NotBeNull();
+            result2.Should().BeOfType(typeof(TableStorageCustomEntity));
+            result2.Should().Equals(customEntity);
+
+            await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
+        }
+
+        [TestMethod]
         public async Task Update_Record()
         {
             string tableName = "updatetest" + DateTime.Now.Second;
