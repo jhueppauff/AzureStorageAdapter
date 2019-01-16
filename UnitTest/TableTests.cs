@@ -109,7 +109,7 @@
         [TestMethod]
         public async Task Insert_Batch_CustomEntity_Into_Table()
         {
-            string tableName = "insertcustomtest" + DateTime.Now.Second;
+            string tableName = "insertbatchcustomtest" + DateTime.Now.Second;
             TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
 
             TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", "rowkey")
