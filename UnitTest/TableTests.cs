@@ -181,7 +181,6 @@
         {
             string tableName = "all" + DateTime.Now.Second;
 
-
             TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
 
             TableStorageCustomEntity[] entities = new TableStorageCustomEntity[10];
