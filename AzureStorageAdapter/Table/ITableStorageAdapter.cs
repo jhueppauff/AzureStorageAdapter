@@ -8,6 +8,7 @@
 
 namespace AzureStorageAdapter.Table
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage.Table;
 
@@ -62,5 +63,13 @@ namespace AzureStorageAdapter.Table
         /// <param name="tableName">The Name of the Table to check</param>
         /// <returns>Returns <see cref="Task{bool}"/></returns>
         Task<bool> TableExits(string tableName);
+
+        /// <summary>
+        /// Get all rows
+        /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        Task<List<TResponse>> GetAll<TResponse>(string tableName) where TResponse : TableEntity, new();
     }
 }
