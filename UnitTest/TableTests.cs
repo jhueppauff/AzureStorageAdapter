@@ -1,6 +1,7 @@
 ﻿namespace UnitTest
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AzureStorageAdapter.Table;
     using FluentAssertions;
@@ -164,7 +165,7 @@
             await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
 
             await tableStorageAdapter.InsertRecordToTable(tableName, customEntity).ConfigureAwait(false);
-          
+
             customEntity.CustomString = "newstring";
 
             await tableStorageAdapter.InsertRecordToTable(tableName, customEntity).ConfigureAwait(false);
@@ -173,6 +174,36 @@
             result.CustomString.Should().Equals("newstring");
 
             await tableStorageAdapter.DeleteTableAsync(tableName).ConfigureAwait(false);
+        }
+
+        [TestMethod]
+        public async Task GetAll()
+        {
+            string tableName = "all" + DateTime.Now.Second;
+
+            TableStorageAdapter tableStorageAdapter = new TableStorageAdapter(configuration.GetSection("AzureBlogStorage:BlobConnectionString").Value);
+
+            TableStorageCustomEntity[] entities = new TableStorageCustomEntity[10];
+
+            for (int i = 0; i < 10; i++)
+            {
+                TableStorageCustomEntity customEntity = new TableStorageCustomEntity("partkey", Guid.NewGuid().ToString())
+                {
+                    CustomInt = 1,
+                    CustomString = "string",
+                    CustomDateTime = DateTime.Now
+                };
+
+                entities[i] = customEntity;
+            }
+
+            await tableStorageAdapter.CreateNewTable(tableName).ConfigureAwait(false);
+
+            await tableStorageAdapter.ExcuteBatchOperationToTable<TableStorageCustomEntity>(tableName, entities).ConfigureAwait(false);
+
+            var retrievedEntities = await tableStorageAdapter.GetAll<TableStorageCustomEntity>(tableName);
+
+            retrievedEntities.Count.Should().Be(10);
         }
     }
 }

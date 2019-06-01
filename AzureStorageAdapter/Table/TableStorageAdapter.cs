@@ -9,6 +9,7 @@
 namespace AzureStorageAdapter.Table
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.RetryPolicies;
@@ -94,6 +95,28 @@ namespace AzureStorageAdapter.Table
 
                 await cloudTable.ExecuteBatchAsync(batchOperation).ConfigureAwait(false);
             }
+        }
+
+        /// <summary>
+        /// Gets all Rows
+        /// </summary>
+        /// <typeparam name="TResponse">The type of the table entity.</typeparam>
+        /// <param name="tableName">Name of the Table</param>
+        /// <returns></returns>
+        public async Task<List<TResponse>> GetAll<TResponse>(string tableName) where TResponse : TableEntity, new()
+        {
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            TableContinuationToken token = null;
+            var entities = new List<TResponse>();
+
+            do
+            {
+                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(new TableQuery<TResponse>(), token);
+                entities.AddRange(queryResult.Results);
+                token = queryResult.ContinuationToken;
+            } while (token != null);
+
+            return entities;
         }
 
         /// <summary>
