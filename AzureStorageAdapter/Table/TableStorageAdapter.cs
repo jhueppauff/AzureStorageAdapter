@@ -12,6 +12,7 @@ namespace AzureStorageAdapter.Table
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using Microsoft.WindowsAzure.Storage.Table;
 
     /// <summary>
@@ -30,6 +31,13 @@ namespace AzureStorageAdapter.Table
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
+
+            cloudTableClient.DefaultRequestOptions = new TableRequestOptions
+            {
+                RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(3), 4),
+                LocationMode = LocationMode.PrimaryThenSecondary,
+                MaximumExecutionTime = TimeSpan.FromSeconds(20)
+            };
         }
 
         /// <summary>
