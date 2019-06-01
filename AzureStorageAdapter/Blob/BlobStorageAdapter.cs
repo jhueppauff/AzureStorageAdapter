@@ -13,6 +13,7 @@ namespace AzureStorageAdapter.Blob
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
     /// <summary>
     /// Blob Storage Adpater for Executing File Operations on the Azure Blob Storage
@@ -28,6 +29,11 @@ namespace AzureStorageAdapter.Blob
         /// The BLOB client
         /// </summary>
         private readonly CloudBlobClient blobClient;
+
+        /// <summary>
+        /// The Cloud Storage Account
+        /// </summary>
+        private readonly CloudStorageAccount storageAccount;
 
         /// <summary>
         /// The prevent automatic creation of blob container
@@ -56,8 +62,8 @@ namespace AzureStorageAdapter.Blob
         /// <param name="preventAutoCreation">Disables the Autocreation of blobs</param>
         public BlobStorageAdapter(string blobConnectionString, bool preventAutoCreation)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            blobClient = storageAccount.CreateCloudBlobClient();
+            storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            blobClient = this.CreateBlobClient();
             this.preventAutoCreation = preventAutoCreation;
         }
 
@@ -188,6 +194,18 @@ namespace AzureStorageAdapter.Blob
             }
 
             return sasConstraints;
+        }
+
+        private CloudBlobClient CreateBlobClient()
+        {
+            CloudBlobClient client = storageAccount.CreateCloudBlobClient();
+            client.DefaultRequestOptions = new BlobRequestOptions
+            {
+                RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(3), 4),
+                LocationMode = LocationMode.PrimaryThenSecondary,
+                MaximumExecutionTime = TimeSpan.FromSeconds(20)
+            };
+            return client;
         }
     }
 }

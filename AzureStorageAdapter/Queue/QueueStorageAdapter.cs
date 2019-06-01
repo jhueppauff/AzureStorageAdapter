@@ -12,6 +12,7 @@ namespace AzureStorageAdapter.Queue
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
     /// <summary>
     /// Azure Storage Queue Adapter handling the most important operations
@@ -31,6 +32,13 @@ namespace AzureStorageAdapter.Queue
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             queueClient = storageAccount.CreateCloudQueueClient();
+
+            queueClient.DefaultRequestOptions = new QueueRequestOptions
+            {
+                RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(3), 4),
+                LocationMode = LocationMode.PrimaryThenSecondary,
+                MaximumExecutionTime = TimeSpan.FromSeconds(20)
+            };
         }
 
         /// <summary>
