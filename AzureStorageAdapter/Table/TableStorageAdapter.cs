@@ -194,7 +194,5 @@ namespace AzureStorageAdapter.Table
             CloudTable cloudTable = cloudTableClient.GetTableReference("test");
             return await cloudTable.ExistsAsync().ConfigureAwait(false);
         }
-
-
     }
 }
