@@ -192,7 +192,7 @@ namespace AzureStorageAdapter.Table
             // Issue is here 
             if (tableResult.HttpStatusCode == 404)
             {
-                return default;
+                return default(TResponse);
             }
 
             return (TResponse)tableResult.Result;
