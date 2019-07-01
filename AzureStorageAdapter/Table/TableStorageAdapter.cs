@@ -6,15 +6,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AzureStorageAdapter.Extentions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Microsoft.WindowsAzure.Storage.Table;
+
 namespace AzureStorageAdapter.Table
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.RetryPolicies;
-    using Microsoft.WindowsAzure.Storage.Table;
-
     /// <summary>
     /// Azure Table Storage Adapter handling the most important operations
     /// </summary>
@@ -93,7 +94,20 @@ namespace AzureStorageAdapter.Table
                     }
                 }
 
-                await cloudTable.ExecuteBatchAsync(batchOperation).ConfigureAwait(false);
+                if (IsBatchCountUnderSupportedOperationsLimit(batchOperation))
+                {
+                    await cloudTable.ExecuteBatchAsync(batchOperation).ConfigureAwait(false);
+                }
+                else
+                {
+                    var limitedBatchOperations = GetLimitedBatchOperations(batchOperation);
+
+                    foreach (var limitedBatchOperation in limitedBatchOperations)
+                    {
+                        var limitedBatch = CreateLimitedTableBatch(limitedBatchOperation);
+                        await cloudTable.ExecuteBatchAsync(limitedBatch).ConfigureAwait(false);
+                    }
+                }   
             }
         }
 
@@ -193,6 +207,46 @@ namespace AzureStorageAdapter.Table
         {
             CloudTable cloudTable = cloudTableClient.GetTableReference("test");
             return await cloudTable.ExistsAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Returns <see cref="bool"/> true if the Operation is under the batch limit
+        /// </summary>
+        /// <param name="batch">The batch operation.</param>
+        /// <returns></returns>
+        private bool IsBatchCountUnderSupportedOperationsLimit(TableBatchOperation batch)
+        {
+            // As Microsoft.WindowsAzure.Storage.Table.Protocol.TableConstants isn't public https://github.com/Azure/azure-storage-net/blob/master/Lib/Common/Table/Protocol/TableConstants.cs in .netcore
+            // Using the value from the class directly
+            return batch.Count <= 100;
+        }
+
+        /// <summary>
+        /// Returns the TableBatch Operation as chunks in a <see cref="IEnumerable{List{TableOperation}}"/>.
+        /// </summary>
+        /// <param name="batch">The Batch Operation</param>
+        /// <returns></returns>
+        private IEnumerable<List<TableOperation>> GetLimitedBatchOperations(TableBatchOperation batch)
+        {
+            // As Microsoft.WindowsAzure.Storage.Table.Protocol.TableConstants isn't public https://github.com/Azure/azure-storage-net/blob/master/Lib/Common/Table/Protocol/TableConstants.cs in .netcore
+            // Using the value from the class directly
+            return batch.ChunkBy(100);
+        }
+
+        /// <summary>
+        /// Creates a subset of the TableBatch Operation
+        /// </summary>
+        /// <param name="tableOperations">The batch as <see cref="IEnumerable{TableOperation}"/>.</param>
+        /// <returns></returns>
+        private TableBatchOperation CreateLimitedTableBatch(IEnumerable<TableOperation> tableOperations)
+        {
+            var limitedBatch = new TableBatchOperation();
+            foreach (var limitedBatchOperation in tableOperations)
+            {
+                limitedBatch.Add(limitedBatchOperation);
+            }
+
+            return limitedBatch;
         }
     }
 }
