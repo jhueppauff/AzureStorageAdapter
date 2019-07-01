@@ -6,17 +6,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AzureStorageAdapter.Extentions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Microsoft.WindowsAzure.Storage.Table;
+
 namespace AzureStorageAdapter.Table
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using AzureStorageAdapter.Extentions;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.RetryPolicies;
-    using Microsoft.WindowsAzure.Storage.Table;
-    using Microsoft.WindowsAzure.Storage.Table.Protocol;
-
     /// <summary>
     /// Azure Table Storage Adapter handling the most important operations
     /// </summary>
