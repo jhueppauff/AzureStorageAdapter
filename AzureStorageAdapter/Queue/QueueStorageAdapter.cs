@@ -150,5 +150,17 @@ namespace AzureStorageAdapter.Queue
             // Delete the queue.
             await queue.DeleteIfExistsAsync().ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Returns true if the queue exists.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns>Returns true if the Queue exists.</returns>
+        public async Task<bool> QueueExistsAsync(string queueName)
+        {
+            CloudQueue queue = queueClient.GetQueueReference(queueName);
+
+            return await queue.ExistsAsync().ConfigureAwait(false);
+        }
     }
 }
