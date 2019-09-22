@@ -44,6 +44,21 @@
             queueLength.Should().Equals(10);
         }
 
+        [TestMethod]
+        public async Task QueueExists()
+        {
+            var result = await queueStorageAdapter.QueueExistsAsync("dontexists");
+
+            result.Should().BeFalse();
+
+            await queueStorageAdapter.CreateQueueAsync("exists");
+            var result2 = await queueStorageAdapter.QueueExistsAsync("exists");
+
+            result2.Should().BeTrue();
+
+            await queueStorageAdapter.DeleteQueueAsync("exists");
+        }
+
         [TestCleanup]
         public async Task Cleanup()
         {
